@@ -57,6 +57,8 @@ import io.jsonwebtoken.Jwts;
 public class App {
 	private static final String AUTH_SERVER_FQDN = "ims-na1.adobelogin.com";
 	private static final String AUTH_ENDPOINT = "/ims/exchange/jwt/";
+	private static final String PROXY_HOST = "localhost";
+	private static final int PROXY_PORT = 8888;
 
 	public static void main(String[] args) {
 		System.out.println("Authenticating with Adobe.io.");
@@ -160,7 +162,7 @@ public class App {
 	private static HttpClientBuilder makeHttpClientBuilderForDebug()
 			throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
 		HttpClientBuilder builder = HttpClientBuilder.create();
-		HttpHost proxy = new HttpHost("localhost", 8888);
+		HttpHost proxy = new HttpHost(PROXY_HOST, PROXY_PORT);
 		builder.setProxy(proxy);
 
 		// setup a Trust Strategy that allows all certificates.
