@@ -85,7 +85,7 @@ public class AppTest extends TestCase {
 			// parse the response
 			System.out.println(EntityUtils.toString(entity1));
 		} catch (Exception e) {
-			fail("Exception: " + e.getMessage());
+			fail("Problem: " + e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
 }
