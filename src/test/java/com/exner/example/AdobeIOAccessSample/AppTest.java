@@ -56,7 +56,7 @@ public class AppTest extends TestCase {
 		String clientSecret = "<put your client secret here>";
 		// from the JWT screen
 		// get there via https://console.adobe.io
-		String metaContexts[] = new String[] { "ent_reactor_admin_sdk" };
+		String entities[] = new String[] { "ent_reactor_admin_sdk" };
 		String apiHostFQDN = "mc-api-activation-reactor.adobe.io";
 		String apiEndpoint = "/properties/";
 		// from Launch UI
@@ -75,7 +75,7 @@ public class AppTest extends TestCase {
 
 			// get the token
 			String accessToken = app.getAccessToken(secretKeyFileName, apiKey, techAccountID, organizationID,
-					clientSecret, metaContexts, httpclient);
+					clientSecret, entities, httpclient);
 
 			// now test that it works
 			// we do so by making a request to the Launch API
