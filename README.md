@@ -17,7 +17,7 @@ There is some setup that you have to do.
 
 You can use Charles (or another proxy) to debug traffic between the app and Adobe IO.
 
-Make sure you set the `PROXY_HOST` and `PROXY_PORT` constants correctly. The actual choice of using a proxy or not happens when you create the `httpClient` on line 24. Just use the HttpClientBuilder of your choice.
+Make sure you set the `PROXY_HOST` and `PROXY_PORT` constants correctly. The actual choice of using a proxy or not happens when you create the `httpClient` on line 75 of the `AppTest` class. Just use the HttpClientBuilder of your choice.
 
 ## Notes
 
