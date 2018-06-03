@@ -10,6 +10,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -18,6 +21,9 @@ import junit.framework.TestSuite;
  * Unit test for simple App.
  */
 public class AppTest extends TestCase {
+	public static final String PROXY_HOST = "localhost";
+	public static final int PROXY_PORT = 8888;
+
 	/**
 	 * Create the test case
 	 *
@@ -56,22 +62,26 @@ public class AppTest extends TestCase {
 		String apiEndpoint = "/properties/";
 		// from Launch UI
 		// get there through https://marketing.adobe.com/activation
-		String popertyID = "<put your property ID here>";
-
+		String propertyID = "<put your property ID here>";
+		
 		App app = new App();
 		try {
-			String accessToken = app.getAccessToken(secretKeyFileName, apiKey, techAccountID, organizationID,
-					clientSecret, metaContexts);
-
-			System.out.println("Step 3 - use API (aka 'done').");
 			// create two HttpClientBuilders for testing purposes
 			// the first one uses a Charles Proxy - meaning you can see all traffic
+			// HttpClientBuilder clientBuilderWithProxy = Tools.makeHttpClientBuilderForDebug(PROXY_HOST, PROXY_PORT);
 			// the second is standard and works without Charles
 			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 			// use either of the HttpClientBuilders here
 			CloseableHttpClient httpclient = clientBuilder.build();
+
+			// get the token
+			String accessToken = app.getAccessToken(secretKeyFileName, apiKey, techAccountID, organizationID,
+					clientSecret, metaContexts, httpclient);
+
+			// now test that it works
+			// we do so by making a request to the Launch API
 			HttpHost apiHost = new HttpHost(apiHostFQDN, 443, "https");
-			HttpGet getRequest = new HttpGet(apiEndpoint + popertyID);
+			HttpGet getRequest = new HttpGet(apiEndpoint + propertyID);
 			getRequest.addHeader("Accept", "application/vnd.api+json;revision=1");
 			getRequest.addHeader("Content-Type", "application/vnd.api+json");
 			getRequest.addHeader("Authorization", "Bearer " + accessToken);
@@ -81,11 +91,20 @@ public class AppTest extends TestCase {
 			if (200 != httpResponse.getStatusLine().getStatusCode()) {
 				throw new IOException("Server returned error: " + httpResponse.getStatusLine().getReasonPhrase());
 			}
-			HttpEntity entity1 = httpResponse.getEntity();
+			HttpEntity entity = httpResponse.getEntity();
 			// parse the response
-			System.out.println(EntityUtils.toString(entity1));
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode jnode = mapper.readValue(entity.getContent(), JsonNode.class);
+			if (null == jnode) {
+				fail("Return value was not valid JSON or it was empty");
+			} else if (null == jnode.get("data")) {
+				fail("Return value seems to be bad format");
+			}
+			// quick and dirty content test
+			assertEquals(propertyID, jnode.get("data").get("id").asText());
 		} catch (Exception e) {
-			fail("Problem: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+			e.printStackTrace();
+			fail("Problem: " + e.getClass().getName() + " - " + e.getMessage());
 		}
 	}
 }

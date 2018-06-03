@@ -24,10 +24,9 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -40,11 +39,9 @@ import io.jsonwebtoken.Jwts;
 public class App {
 	private static final String AUTH_SERVER_FQDN = "ims-na1.adobelogin.com";
 	private static final String AUTH_ENDPOINT = "/ims/exchange/jwt/";
-	public static final String PROXY_HOST = "localhost";
-	public static final int PROXY_PORT = 8888;
 
 	public String getAccessToken(String secretKeyFileName, String apiKey, String techAccountID, String organizationID,
-			String clientSecret, String[] metaContexts)
+			String clientSecret, String[] metaContexts, HttpClient httpClient)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyManagementException,
 			KeyStoreException, ClientProtocolException, JsonParseException, JsonMappingException {
 		System.out.println("Step 1 - generating a JWT...");
@@ -80,15 +77,7 @@ public class App {
 		params.add(new BasicNameValuePair("client_secret", clientSecret));
 		params.add(new BasicNameValuePair("jwt_token", jwtToken));
 		authPostRequest.setEntity(new UrlEncodedFormEntity(params, Consts.UTF_8));
-		// create two HttpClientBuilders for testing purposes
-		// the first one uses a Charles Proxy - meaning you can see all traffic
-		// the second is standard and works without Charles
-		HttpClientBuilder clientBuilderForDebuggingWithCharles = Tools.makeHttpClientBuilderForDebug(PROXY_HOST,
-				PROXY_PORT);
-		// HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-		// use either of the HttpClientBuilders here
-		CloseableHttpClient httpclient = clientBuilderForDebuggingWithCharles.build();
-		HttpResponse response = httpclient.execute(authServer, authPostRequest);
+		HttpResponse response = httpClient.execute(authServer, authPostRequest);
 		if (200 != response.getStatusLine().getStatusCode()) {
 			throw new IOException("Server returned error: " + response.getStatusLine().getReasonPhrase());
 		}
