@@ -65,10 +65,10 @@ public class App {
 		String secretKeyFileName = "secret.key";
 		// from the Integration Overview screen
 		// get there via https://console.adobe.io
-		String apiKey = "aca42dd14e9d4fb88cd231479f5eb601";
-		String techAccountID = "B82D3A725B0BF8F60A495C49@techacct.adobe.com";
-		String organizationID = "BE5121AA565821017F000101@AdobeOrg";
-		String clientSecret = "31183fa3-19c5-469c-bdca-3f852ded9e75";
+		String apiKey = "<put your API Key here>";
+		String techAccountID = "<put your technical account ID here>";
+		String organizationID = "<put your organization ID here>";
+		String clientSecret = "<put your client secret here>";
 		// from the JWT screen
 		// get there via https://console.adobe.io
 		String metaContexts[] = new String[] { "ent_reactor_admin_sdk" };
@@ -76,7 +76,7 @@ public class App {
 		String apiEndpoint = "/properties/";
 		// from Launch UI
 		// get there through https://marketing.adobe.com/activation
-		String popertyID = "PR331f44fae6bf4d23a35656120fc9fdd0";
+		String popertyID = "<put your property ID here>";
 
 		try {
 			System.out.println("Step 1 - generating a JWT...");
@@ -113,9 +113,13 @@ public class App {
 			params.add(new BasicNameValuePair("client_secret", clientSecret));
 			params.add(new BasicNameValuePair("jwt_token", jwtToken));
 			authPostRequest.setEntity(new UrlEncodedFormEntity(params, Consts.UTF_8));
-			// get token
-			HttpClientBuilder b = makeHttpClientBuilderForDebug();
-			CloseableHttpClient httpclient = b.build();
+			// create two HttpClientBuilders for testing purposes
+			// the first one uses a Charles Proxy - meaning you can see all traffic
+			// the second is standard and works without Charles
+			HttpClientBuilder clientBuilderForDebuggingWithCharles = makeHttpClientBuilderForDebug();
+			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+			// use either of the HttpClientBuilders here
+			CloseableHttpClient httpclient = clientBuilderForDebuggingWithCharles.build();
 			HttpResponse response = httpclient.execute(authServer, authPostRequest);
 			if (200 != response.getStatusLine().getStatusCode()) {
 				throw new IOException("Server returned error: " + response.getStatusLine().getReasonPhrase());
