@@ -1,6 +1,6 @@
 # adobeio-authentication-java-sample
 
-Simple code that demonstrates how to authenticate against adobe.io using Java. On July 3rd, there will be a [blog article explaining this](http://webanalyticsfordevelopers.com/2018/07/03/accessing-adobe-io-using-java/).
+Simple code that demonstrates how to authenticate against adobe.io using Java. Read the [blog article explaining this](http://webanalyticsfordevelopers.com/2018/07/03/accessing-adobe-io-using-java/).
 
 ## How to use this code
 
